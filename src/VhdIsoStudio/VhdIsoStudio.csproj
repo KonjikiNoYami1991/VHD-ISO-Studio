@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    VHD ISO Studio - progetto WPF .NET 10 LTS (Windows x64 / ARM64).
+    La versione ha UNA sola fonte di verita': <Version> qui sotto.
+    Build: vedi build.ps1 (locale) o .github/workflows/build.yml (CI).
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>VhdIsoStudio</RootNamespace>
+    <AssemblyName>VhdIsoStudio</AssemblyName>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!-- Versioning -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Product>VHD ISO Studio</Product>
+    <Title>VHD ISO Studio</Title>
+    <Description>Monta VHD/VHDX, cattura il contenuto e crea ISO con oscdimg</Description>
+    <Company>VHD ISO Studio contributors</Company>
+    <Copyright>(c) 2026 VHD ISO Studio contributors - MIT License</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
+
+    <!-- Icona exe + manifest (requireAdministrator, DPI PerMonitorV2, long path) -->
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Standalone: runtime incluso, file singolo, niente trimming (WPF non lo supporta) -->
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en;it</SatelliteResourceLanguages>
+    <DebugType>embedded</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\app.png" />
+  </ItemGroup>
+
+</Project>

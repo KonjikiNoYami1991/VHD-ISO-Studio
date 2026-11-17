@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Test della logica indipendente da WPF (girano su Windows e Linux). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/VhdIsoStudio/Core/OscdimgOptions.cs" Link="Core/OscdimgOptions.cs" />
+    <Compile Include="../../src/VhdIsoStudio/Core/ProcessRunner.cs" Link="Core/ProcessRunner.cs" />
+    <Compile Include="../../src/VhdIsoStudio/Core/Logger.cs" Link="Core/Logger.cs" />
+    <Compile Include="../../src/VhdIsoStudio/Core/AppInfo.cs" Link="Core/AppInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+</Project>

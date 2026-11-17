@@ -1,0 +1,27 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Palette tema "Dark" (contrasti verificati WCAG AA: testo >= 4.5:1, componenti >= 3:1) -->
+  <Color x:Key="C.Bg">#FF111318</Color>
+  <Color x:Key="C.Accent">#FF8B93FF</Color>
+  <SolidColorBrush x:Key="Bg" Color="#FF111318"/>
+  <SolidColorBrush x:Key="Surface" Color="#FF1B1E26"/>
+  <SolidColorBrush x:Key="SurfaceAlt" Color="#FF242833"/>
+  <SolidColorBrush x:Key="Hover" Color="#FF2E3341"/>
+  <SolidColorBrush x:Key="Line" Color="#FF737C90"/>
+  <SolidColorBrush x:Key="Fg" Color="#FFE8EAF0"/>
+  <SolidColorBrush x:Key="FgMuted" Color="#FFAEB4C4"/>
+  <SolidColorBrush x:Key="Accent" Color="#FF8B93FF"/>
+  <SolidColorBrush x:Key="AccentHover" Color="#FFA5ACFF"/>
+  <SolidColorBrush x:Key="OnAccent" Color="#FF0B0D12"/>
+  <SolidColorBrush x:Key="Ok" Color="#FF4ADE80"/>
+  <SolidColorBrush x:Key="Warn" Color="#FFFBBF24"/>
+  <SolidColorBrush x:Key="Err" Color="#FFF87171"/>
+  <SolidColorBrush x:Key="Focus" Color="#FFFDE047"/>
+  <SolidColorBrush x:Key="InputBg" Color="#FF151820"/>
+  <SolidColorBrush x:Key="Selection" Color="#FF3A3F7A"/>
+  <SolidColorBrush x:Key="AccentSoft" Color="#334F46E5"/>
+  <LinearGradientBrush x:Key="HeaderBrush" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#FF312E81" Offset="0"/>
+    <GradientStop Color="#FF0E7490" Offset="1"/>
+  </LinearGradientBrush>
+</ResourceDictionary>

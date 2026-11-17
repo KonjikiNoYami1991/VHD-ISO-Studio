@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Verifica di compilazione del codice C# su sistemi senza WindowsDesktop SDK (Linux/CI):
+    compila tutti i .cs del progetto contro gli assembly di riferimento WPF, usando gli stub
+    generati da XamlCheck al posto del codice prodotto dal compilatore XAML.
+    NON produce l'app: la build reale si fa con build.ps1 / GitHub Actions su Windows.
+  -->
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>VhdIsoStudio</RootNamespace>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>CS8618</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
+    <Compile Include="../../src/VhdIsoStudio/**/*.cs" Exclude="../../src/VhdIsoStudio/obj/**;../../src/VhdIsoStudio/bin/**" />
+    <Compile Include="$(StubFile)" Condition="'$(StubFile)' != ''" />
+  </ItemGroup>
+</Project>

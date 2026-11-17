@@ -1,0 +1,120 @@
+<p align="center">
+  <img src="src/VhdIsoStudio/Assets/app.png" width="96" alt="VHD ISO Studio logo">
+</p>
+
+<h1 align="center">VHD ISO Studio</h1>
+
+<p align="center">
+  Monta un VHD/VHDX, cattura il contenuto e crea un'ISO con <code>oscdimg</code>: tutti i parametri, oppure un clic in modalità automatica.<br>
+  <em>Mount a VHD/VHDX, capture its content and build an ISO with <code>oscdimg</code>: every parameter, or one click in automatic mode.</em>
+</p>
+
+<p align="center">
+  Windows 10/11 · x64 e ARM64 · .NET 10 LTS (incluso nell'exe) · Italiano / English · MIT
+</p>
+
+---
+
+🇮🇹 [Italiano](#-italiano) · 🇬🇧 [English](#-english)
+
+## 🇮🇹 Italiano
+
+### Cosa fa
+| Funzione | Dettagli |
+|---|---|
+| **Montaggio** | VHD e VHDX tramite il modulo Storage di Windows (`Mount-DiskImage`), in **sola lettura** di default; assegnazione automatica delle lettere ai volumi; i dischi montati dall'app vengono smontati all'uscita (anche in caso di errore). |
+| **Cattura** | 3 modalità: **diretta** dal volume (più veloce), **copia** con robocopy in una cartella di lavoro (esclude pagefile, hiberfil, cestino, System Volume Information), **immagine WIM** con DISM (`/Capture-Image` con compressione, `/CheckIntegrity`, `/Verify`, `/Bootable`, `/NoRpFix`, `/EA`, `/ConfigFile`). |
+| **Supporto base** | Il WIM catturato può essere inserito in un supporto Windows (ISO o cartella) come `sources\install.wim` per ottenere un'**ISO di installazione avviabile**. |
+| **oscdimg completo** | Tutte le opzioni documentate dall'help di oscdimg 2.56: file system (`-u1 -u2 -j1 -j2 -n -nt -d -uv -ut`), UDF (`-udfver102/150/200 -us -ue -uf -yl -ur`), Joliet (`-js`), boot (`-b -p -e`, `-bootdata` BIOS+UEFI, load segment `t`), ottimizzazione (`-o -oc -oi -os`), ordine (`-y5 -yo`), messaggi (`-w1..-w4 -yd -a`), generali (`-l -t -g -h -c -y6 -yw -k -q -m -maxsize -r`) + argomenti extra. Anteprima del comando in tempo reale, validazione dei conflitti, preset. |
+| **Modalità automatica** | Monta in sola lettura → riconosce il contenuto → supporto avviabile = ISO BIOS+UEFI; Windows installato = cattura WIM (+ supporto base = ISO d'installazione); dati = ISO UDF → smonta → SHA-256. |
+| **Dipendenze** | Se `oscdimg.exe` manca, l'app scarica da Microsoft l'installer del **Windows ADK**, ne **verifica la firma Authenticode** (deve essere Microsoft Corporation) e installa in silenzio **solo i Deployment Tools**. Ripiego: `winget`. Il runtime .NET è incluso nell'exe. |
+| **Sicurezza** | Solo account **amministratore** (locale o di dominio) con token elevato (manifest `requireAdministrator` + controllo interno). Opera solo su dischi `File Backed Virtual`. Cartelle di lavoro pericolose (radici di unità, Windows, Program Files, profili) bloccate. Nessun riavvio mai. |
+| **Interfaccia** | WPF moderna, temi **Scuro / Intermedio / Chiaro / Segui Windows**, barra del titolo coordinata, icona in titlebar, taskbar ed exe, avanzamento con percentuale, tempo stimato e progresso nella taskbar, annullamento, drag & drop (anche da Esplora file non elevato), istanza singola. |
+| **Accessibilità** | Navigazione completa da tastiera, tasti di accesso (Alt+lettera), anello di focus ad alta visibilità, nomi/descrizioni UI Automation per screen reader, annunci di stato (live region), contrasti **WCAG AA** verificati in tutti i temi, supporto all'**Alto contrasto** di Windows, DPI Per-Monitor V2, opzione "Riduci animazioni". |
+
+### Scorciatoie
+| Tasti | Azione |
+|---|---|
+| `F5` / `Ctrl+Invio` | Avvia (scheda corrente) |
+| `Esc` | Annulla l'operazione |
+| `Ctrl+O` | Scegli disco virtuale |
+| `Ctrl+M` / `Ctrl+U` | Monta / Smonta |
+| `Ctrl+1…4` | Cambia scheda |
+| `Ctrl+L` | Italiano ↔ English |
+| `Ctrl+T` | Tema successivo |
+| `Ctrl+Maiusc+C` | Copia il comando oscdimg |
+| `Ctrl+I` | Installa ADK |
+| `Ctrl+Maiusc+L` | Apri la cartella dei log |
+| `F1` | Informazioni e guida |
+
+### Riga di comando
+```
+VhdIsoStudio.exe disco.vhdx                       precompila la sorgente
+VhdIsoStudio.exe --auto disco.vhdx [cartella]     avvia subito la modalità automatica
+VhdIsoStudio.exe --selftest                       verifica risorse ed esce (0 = ok)
+```
+
+### File e log
+- Log: `%ProgramData%\VhdIsoStudio\Logs` (conservati 14 giorni; contiene anche i log di DISM e dell'installazione ADK)
+- Impostazioni: `%LOCALAPPDATA%\VhdIsoStudio\settings.json`
+
+### Compilare
+Requisiti: Windows 10/11, [.NET 10 SDK](https://dotnet.microsoft.com/download) (lo script propone di installarlo con winget).
+```
+build.bat                                   (doppio clic)
+.\build.ps1 -Runtime win-x64,win-arm64      (da PowerShell, meglio se elevata per il selftest)
+```
+L'exe finale è in `dist\VhdIsoStudio_<versione>_<rid>.exe` con il relativo `.sha256`.
+La CI (GitHub Actions) esegue test, verifica statica e build x64/ARM64 a ogni push; sui tag `v*` pubblica una release.
+
+Su Linux/macOS si possono eseguire i controlli statici (non la build dell'exe): `bash tools/verify.sh` e `dotnet test tests/VhdIsoStudio.Tests`.
+
+### Note e limiti noti
+- **SmartScreen/antivirus**: l'exe non è firmato digitalmente; al primo avvio SmartScreen può mostrare un avviso. La soluzione definitiva è firmarlo con un certificato di code signing.
+- I dischi protetti da **BitLocker** vanno sbloccati prima. Dischi **differenziali** (`.avhdx`) e VHD in uso da una VM accesa non possono essere montati.
+- Per un'ISO d'installazione da un Windows installato, l'immagine dovrebbe essere **generalizzata con Sysprep**.
+- Su Windows Server con SAN policy "offline", l'app porta online il disco virtuale che ha montato.
+
+---
+
+## 🇬🇧 English
+
+### What it does
+| Feature | Details |
+|---|---|
+| **Mounting** | VHD and VHDX via the Windows Storage module (`Mount-DiskImage`), **read-only** by default; automatic drive letter assignment; disks mounted by the app are dismounted on exit (even after errors). |
+| **Capture** | 3 modes: **direct** from the volume (fastest), **copy** with robocopy to a working folder (skips pagefile, hiberfil, recycle bin, System Volume Information), **WIM image** with DISM (`/Capture-Image` with compression, `/CheckIntegrity`, `/Verify`, `/Bootable`, `/NoRpFix`, `/EA`, `/ConfigFile`). |
+| **Base media** | The captured WIM can be injected into Windows media (ISO or folder) as `sources\install.wim` to get a **bootable setup ISO**. |
+| **Full oscdimg** | Every option documented by oscdimg 2.56 help: file systems (`-u1 -u2 -j1 -j2 -n -nt -d -uv -ut`), UDF (`-udfver102/150/200 -us -ue -uf -yl -ur`), Joliet (`-js`), boot (`-b -p -e`, BIOS+UEFI `-bootdata`, load segment `t`), optimization (`-o -oc -oi -os`), order (`-y5 -yo`), messages (`-w1..-w4 -yd -a`), general (`-l -t -g -h -c -y6 -yw -k -q -m -maxsize -r`) + extra arguments. Live command preview, conflict validation, presets. |
+| **Automatic mode** | Mounts read-only → detects content → bootable media = BIOS+UEFI ISO; installed Windows = WIM capture (+ base media = setup ISO); data = UDF ISO → dismounts → SHA-256. |
+| **Dependencies** | If `oscdimg.exe` is missing, the app downloads the **Windows ADK** installer from Microsoft, **verifies its Authenticode signature** (must be Microsoft Corporation) and silently installs **only the Deployment Tools**. Fallback: `winget`. The .NET runtime is bundled in the exe. |
+| **Safety** | **Administrator** accounts only (local or domain) with an elevated token (`requireAdministrator` manifest + internal check). Works only on `File Backed Virtual` disks. Dangerous working folders (drive roots, Windows, Program Files, profiles) are blocked. Never reboots. |
+| **UI** | Modern WPF, **Dark / Medium / Light / Follow Windows** themes, matching title bar, icon in title bar, taskbar and exe, progress with percentage, ETA and taskbar progress, cancellation, drag & drop (also from non-elevated File Explorer), single instance. |
+| **Accessibility** | Full keyboard navigation, access keys (Alt+letter), high-visibility focus ring, UI Automation names/descriptions for screen readers, status announcements (live region), **WCAG AA** contrast verified in every theme, Windows **High Contrast** support, Per-Monitor V2 DPI, "Reduce motion" option. |
+
+### Shortcuts
+`F5`/`Ctrl+Enter` start · `Esc` cancel · `Ctrl+O` choose disk · `Ctrl+M`/`Ctrl+U` mount/dismount · `Ctrl+1…4` tabs · `Ctrl+L` language · `Ctrl+T` theme · `Ctrl+Shift+C` copy oscdimg command · `Ctrl+I` install ADK · `Ctrl+Shift+L` log folder · `F1` about.
+
+### Command line
+```
+VhdIsoStudio.exe disk.vhdx                        pre-fills the source
+VhdIsoStudio.exe --auto disk.vhdx [folder]        starts automatic mode right away
+VhdIsoStudio.exe --selftest                       checks resources and exits (0 = ok)
+```
+
+### Build
+Requirements: Windows 10/11, [.NET 10 SDK](https://dotnet.microsoft.com/download). Run `build.bat` or `.\build.ps1 -Runtime win-x64,win-arm64`. Output: `dist\VhdIsoStudio_<version>_<rid>.exe` + `.sha256`. CI builds x64/ARM64 on every push and publishes a release on `v*` tags.
+
+### Known limitations
+Unsigned exe (SmartScreen may warn); BitLocker volumes must be unlocked first; differencing disks and VHDs used by a running VM cannot be mounted; for setup ISOs the captured Windows should be Sysprep-generalized.
+
+---
+
+### Fonti / Sources
+- Opzioni di oscdimg: output di `oscdimg -help` v2.56 (mirror: [cnman.github.io/oscdimg.html](https://cnman.github.io/oscdimg.html)); riferimento Microsoft: [Oscdimg Command-Line Options](https://learn.microsoft.com/windows-hardware/manufacture/desktop/oscdimg-command-line-options)
+- Installazione silenziosa ADK: [Install the Windows ADK offline](https://learn.microsoft.com/windows-hardware/get-started/adk-offline-install); URL dell'installer: manifest winget [Microsoft.WindowsADK](https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsADK)
+- DISM: [DISM Image Management Command-Line Options](https://learn.microsoft.com/windows-hardware/manufacture/desktop/dism-image-management-command-line-options-s14)
+- Mount-DiskImage: [Storage module](https://learn.microsoft.com/powershell/module/storage/mount-diskimage)
+
+## Licenza / License
+[MIT](LICENSE). oscdimg, DISM e Windows ADK sono componenti Microsoft con licenze proprie e **non** sono inclusi. / oscdimg, DISM and the Windows ADK are Microsoft components under their own licenses and are **not** bundled.
