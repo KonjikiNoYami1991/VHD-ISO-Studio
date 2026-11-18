@@ -64,7 +64,7 @@ I file si trovano nelle **[Releases](../../releases)** o negli *Artifacts* dell'
 
 ```powershell
 # verifica l'integrità / verify integrity
-(Get-FileHash .\VhdIsoStudio_1.1.0_win-x64_portable.zip -Algorithm SHA256).Hash
+(Get-FileHash .\VhdIsoStudio_1.2.0_win-x64_portable.zip -Algorithm SHA256).Hash
 ```
 
 ---

@@ -62,6 +62,7 @@ jobs:
             "$hash *$f" | Set-Content "$f.sha256" -Encoding ascii
           }
           Get-ChildItem $pkg | Format-Table Name, Length
+          "VER=$ver" | Out-File $env:GITHUB_ENV -Append
           "EXE_NAME=$exe" | Out-File $env:GITHUB_ENV -Append
           "ZIP_NAME=$zip" | Out-File $env:GITHUB_ENV -Append
       - name: Selftest (exe singolo + portabile)
@@ -122,6 +123,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          name: VHD ISO Studio ${{ env.VER }}
+          body_path: docs/RELEASE-NOTES-${{ env.VER }}.md
           files: |
             ${{ env.EXE_NAME }}
             ${{ env.EXE_NAME }}.sha256

@@ -94,6 +94,7 @@ internal static class Strings
         ["AutoSummary_"] = ("Completato.", "Completed."),
         ["ResultOk"] = ("ISO creata con successo", "ISO created successfully"),
         ["ResultSize"] = ("Dimensione", "Size"),
+        ["ResultSpeed"] = ("Velocità media", "Average speed"),
         ["ResultTime"] = ("Durata", "Duration"),
         ["ResultDetailsA11y"] = ("Dettagli del risultato", "Result details"),
         ["BtnOpenFolder"] = ("Apri _cartella", "Open _folder"),

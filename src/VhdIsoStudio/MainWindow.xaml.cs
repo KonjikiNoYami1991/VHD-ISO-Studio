@@ -44,6 +44,8 @@ public partial class MainWindow : Window
     private double _stageFirstPct = -1;
     private DateTime _lastUiUpdate = DateTime.MinValue;
 
+    private static string BaseTitle => $"{AppInfo.Name} {AppInfo.Version}";
+
     public MainWindow()
     {
         InitializeComponent();
@@ -53,7 +55,7 @@ public partial class MainWindow : Window
         Width = Math.Max(MinWidth, S.WindowWidth);
         Height = Math.Max(MinHeight, S.WindowHeight);
         if (S.WindowMaximized) WindowState = WindowState.Maximized;
-        Title = $"{AppInfo.Name} {AppInfo.Version}";
+        Title = BaseTitle;
         TaskbarItemInfo = new TaskbarItemInfo();
 
         // log nella UI (flush periodico, mai dal thread di lavoro)
@@ -1102,6 +1104,8 @@ public partial class MainWindow : Window
         {
             sb.AppendLine(r.IsoPath);
             sb.AppendLine($"{Loc.T("ResultSize")}: {Format.Bytes(r.IsoSize)}");
+            if (r.IsoSize > 0 && r.Elapsed.TotalSeconds >= 1)
+                sb.AppendLine($"{Loc.T("ResultSpeed")}: {Format.Bytes((long)(r.IsoSize / r.Elapsed.TotalSeconds))}/s");
         }
         if (r.Sha256.Length > 0) sb.AppendLine("SHA-256: " + r.Sha256);
         if (r.WimPath != null) sb.AppendLine("WIM: " + r.WimPath);
@@ -1196,6 +1200,7 @@ public partial class MainWindow : Window
             Progress.IsIndeterminate = false;
             Progress.Value = pct;
             StatusPercent.Text = $"{pct:0}%";
+            Title = $"{pct:0}% · {BaseTitle}"; // visibile anche in taskbar e Alt+Tab
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
             TaskbarItemInfo.ProgressValue = pct / 100.0;
             double done = pct - _stageFirstPct;
@@ -1229,8 +1234,11 @@ public partial class MainWindow : Window
             b.IsEnabled = !busy;
         BtnDismount.IsEnabled = !busy && _mounted != null;
         Cursor = busy ? Cursors.AppStarting : null;
+        NativeMethods.KeepAwake(busy); // niente sospensione del PC a meta' di una ISO
+        if (busy) Logger.Info("Sospensione automatica del sistema bloccata fino al termine del lavoro.");
         if (!busy)
         {
+            Title = BaseTitle;
             Progress.IsIndeterminate = false;
             Progress.Value = 0;
             StatusPercent.Text = "";

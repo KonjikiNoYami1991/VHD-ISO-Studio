@@ -11,6 +11,8 @@
  *            <file.vhd|vhdx> (precompila la sorgente).
  *
  * Changelog
+ * 1.2.0 (2026-11-18) - Il PC non va in sospensione durante i lavori; percentuale di avanzamento nel titolo
+ *                      (taskbar/Alt+Tab); velocita' media nel risultato; note di rilascio nella release.
  * 1.1.0 (2026-11-18) - Completamente portabile: Data\ accanto all'exe (impostazioni, log, download,
  *                      lavoro), oscdimg + file di boot in tools\oscdimg senza installare l'ADK
  *                      (layout offline + msiexec /a), build ZIP portabile senza estrazioni in %TEMP%.

@@ -56,6 +56,21 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
+    [DllImport("kernel32.dll")]
+    internal static extern uint SetThreadExecutionState(uint esFlags);
+
+    private const uint ES_CONTINUOUS = 0x80000000, ES_SYSTEM_REQUIRED = 0x00000001;
+
+    /// <summary>
+    /// Impedisce (true) o consente di nuovo (false) la sospensione automatica del PC durante un lavoro lungo.
+    /// Lo schermo puo' comunque spegnersi. Va chiamato sempre dallo stesso thread (UI): lo stato e' per-thread.
+    /// </summary>
+    internal static void KeepAwake(bool on)
+    {
+        try { SetThreadExecutionState(on ? ES_CONTINUOUS | ES_SYSTEM_REQUIRED : ES_CONTINUOUS); }
+        catch { }
+    }
+
     /// <summary>Lampeggia in taskbar finche' la finestra non torna in primo piano.</summary>
     internal static void Flash(IntPtr hwnd)
     {
