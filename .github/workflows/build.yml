@@ -77,6 +77,22 @@ jobs:
           if ($p.ExitCode -ne 0) { throw "Selftest portabile fallito: codice $($p.ExitCode)" }
           if (-not (Get-ChildItem "st\VhdIsoStudio\Data\Logs" -Filter *.log -ErrorAction SilentlyContinue)) { throw "Modalita' portabile: log non creato in Data\Logs" }
           Write-Host "Selftest OK (single + portable, log in Data\Logs)"
+      - name: Screenshot per la documentazione
+        if: matrix.rid == 'win-x64'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $shots = Join-Path $pwd 'screenshots'
+          $p = Start-Process -FilePath "st\VhdIsoStudio\VhdIsoStudio.exe" -ArgumentList '--screenshots', "`"$shots`"" -Wait -PassThru
+          Get-ChildItem $shots -ErrorAction SilentlyContinue | Format-Table Name, Length
+          if ($p.ExitCode -ne 0) { Get-Content st\VhdIsoStudio\Data\Logs\*.log -Tail 40; throw "Screenshot falliti: codice $($p.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        if: matrix.rid == 'win-x64'
+        continue-on-error: true
+        with:
+          name: screenshots
+          path: screenshots/*.png
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
           name: VhdIsoStudio-${{ matrix.rid }}

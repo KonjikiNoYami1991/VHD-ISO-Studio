@@ -107,6 +107,8 @@ public partial class MainWindow : Window
             _ = StartAutoAsync();
         }
         DropZone.Focus();
+
+        if (App.ScreenshotDir != null) _ = CaptureScreenshotsAsync(App.ScreenshotDir);
     }
 
     public void BringToFront()

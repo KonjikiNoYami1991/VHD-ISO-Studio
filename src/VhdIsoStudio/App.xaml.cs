@@ -18,6 +18,7 @@
  *                      tutti i parametri oscdimg, modalita' automatica, installazione ADK
  *                      Deployment Tools con verifica firma, IT/EN, temi, accessibilita'.
  */
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -34,6 +35,9 @@ public partial class App : Application
 
     public static AppSettings Settings { get; private set; } = new();
     public static string[] StartupArgs { get; private set; } = Array.Empty<string>();
+
+    /// <summary>--screenshots &lt;cartella&gt;: genera gli screenshot della documentazione con dati di esempio ed esce.</summary>
+    public static string? ScreenshotDir { get; private set; }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -53,7 +57,10 @@ public partial class App : Application
             return;
         }
 
-        Settings = AppSettings.Load();
+        int si = Array.FindIndex(e.Args, a => a.Equals("--screenshots", StringComparison.OrdinalIgnoreCase));
+        if (si >= 0) ScreenshotDir = e.Args.Length > si + 1 ? e.Args[si + 1] : Path.Combine(AppInfo.AppDir, "screenshots");
+
+        Settings = ScreenshotDir != null ? new AppSettings() : AppSettings.Load();
         Loc.Instance.SetLanguage(Settings.Language);
 
         try { NativeMethods.SetCurrentProcessExplicitAppUserModelID(AppInfo.AppUserModelId); } catch { }
@@ -69,7 +76,7 @@ public partial class App : Application
         }
 
         // istanza singola: la seconda istanza riattiva la prima
-        _mutex = new Mutex(true, MutexName, out bool created);
+        _mutex = new Mutex(true, ScreenshotDir != null ? MutexName + ".Screenshots" : MutexName, out bool created);
         if (!created)
         {
             try
@@ -102,7 +109,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         try { DiskImageService.DismountAllOwned(); } catch { }
-        Settings.Save();
+        if (ScreenshotDir == null) Settings.Save();
         Logger.Info($"==== chiusura (codice {e.ApplicationExitCode})");
         try { _mutex?.ReleaseMutex(); } catch { }
         base.OnExit(e);
