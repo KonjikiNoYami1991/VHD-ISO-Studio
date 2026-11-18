@@ -6,7 +6,10 @@
     1. verifica/installa il .NET 10 SDK (winget, previa conferma)
     2. legge la versione da src\VhdIsoStudio\VhdIsoStudio.csproj (<Version>)
     3. esegue i test unitari (salvo -SkipTests)
-    4. dotnet publish per ogni runtime richiesto (win-x64, win-arm64)
+    4. dotnet publish per ogni runtime richiesto (win-x64, win-arm64):
+       - exe singolo  dist\VhdIsoStudio_<ver>_<rid>.exe
+       - ZIP portabile dist\VhdIsoStudio_<ver>_<rid>_portable.zip (librerie native accanto all'exe,
+         nessuna estrazione in %TEMP%; dati in Data\ e oscdimg in tools\oscdimg)
     5. esegue l'exe con --selftest (richiede console elevata: l'app e' requireAdministrator)
     6. calcola SHA-256 e scrive dist\build.log
 
@@ -21,7 +24,7 @@
     .\build.ps1 -Runtime win-x64,win-arm64
 
 .NOTES
-    Versione script: 1.0.0 (2026-11-17)
+    Versione script: 1.1.0 (2026-11-18) - aggiunto pacchetto ZIP portabile
     Codici di uscita: 0 ok, 1 SDK mancante, 2 test falliti, 3 publish fallito, 4 selftest fallito.
 #>
 #Requires -Version 5.1
@@ -92,6 +95,24 @@ foreach ($rid in $Runtime) {
     $exe = Join-Path $out 'VhdIsoStudio.exe'
     $named = Join-Path $dist ("VhdIsoStudio_{0}_{1}.exe" -f $version, $rid)
     Copy-Item $exe $named -Force
+
+    # --- 4b. pacchetto portabile (cartella + ZIP)
+    $pkgRoot = Join-Path $dist "pkg-$rid"
+    $pkg = Join-Path $pkgRoot 'VhdIsoStudio'
+    if (Test-Path $pkgRoot) { Remove-Item $pkgRoot -Recurse -Force }
+    Write-Log "Publish portabile $rid..."
+    & dotnet publish $proj -c Release -r $rid --self-contained true -p:PortableBuild=true -o $pkg --nologo
+    if ($LASTEXITCODE -ne 0) { Write-Log "Publish portabile $rid fallito." 'Red'; exit 3 }
+    Get-ChildItem $pkg -Filter *.pdb | Remove-Item -Force
+    Copy-Item (Join-Path $root 'docs\LEGGIMI-PORTABLE.txt') $pkg
+    Copy-Item (Join-Path $root 'LICENSE') (Join-Path $pkg 'LICENSE.txt')
+    New-Item -ItemType Directory -Force -Path (Join-Path $pkg 'tools\oscdimg') | Out-Null
+    $zip = Join-Path $dist ("VhdIsoStudio_{0}_{1}_portable.zip" -f $version, $rid)
+    if (Test-Path $zip) { Remove-Item $zip -Force }
+    Compress-Archive -Path $pkg -DestinationPath $zip
+    $zhash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+    Set-Content -Path "$zip.sha256" -Value "$zhash *$(Split-Path $zip -Leaf)" -Encoding ASCII
+    Write-Log ("{0}  {1:N1} MB  SHA256 {2}" -f (Split-Path $zip -Leaf), ((Get-Item $zip).Length / 1MB), $zhash) 'Green'
 
     # --- 5. selftest (solo x64 su host x64, richiede elevazione)
     $hostArm = $env:PROCESSOR_ARCHITECTURE -eq 'ARM64'

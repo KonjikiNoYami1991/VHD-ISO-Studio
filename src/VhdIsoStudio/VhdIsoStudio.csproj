@@ -18,9 +18,9 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
     <!-- Versioning -->
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
     <Product>VHD ISO Studio</Product>
     <Title>VHD ISO Studio</Title>
     <Description>Monta VHD/VHDX, cattura il contenuto e crea ISO con oscdimg</Description>
@@ -44,6 +44,14 @@
     <DebugType>embedded</DebugType>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!--
+    Build portabile (-p:PortableBuild=true): le librerie native WPF restano accanto all'exe invece di
+    essere estratte in %TEMP%\.net all'avvio. Risultato: nessuna scrittura fuori dalla cartella dell'app.
+  -->
+  <PropertyGroup Condition="'$(PortableBuild)' == 'true'">
+    <IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>

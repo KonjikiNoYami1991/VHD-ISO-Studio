@@ -327,6 +327,10 @@ public sealed class JobEngine
         if (o.ConfigFile.Length > 0) a.Add($"/ConfigFile:\"{o.ConfigFile}\"");
         string logFile = Path.Combine(AppInfo.LogDir, $"dism_{DateTime.Now:yyyyMMdd_HHmmss}.log");
         a.Add($"/LogPath:\"{logFile}\"");
+        // cartella scratch di DISM dentro i dati dell'app (portabilita': niente %TEMP%)
+        string scratch = Path.Combine(AppInfo.WorkDir, "dism_scratch");
+        try { Directory.CreateDirectory(scratch); a.Add($"/ScratchDir:\"{scratch}\""); }
+        catch (Exception ex) { Logger.Warn("ScratchDir DISM non disponibile, uso quella predefinita: " + ex.Message); }
 
         if (File.Exists(wim)) { Logger.Warn("WIM esistente sovrascritto: " + wim); File.Delete(wim); }
         string stage = Loc.T("StageDism");

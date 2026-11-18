@@ -10,6 +10,24 @@ internal static class Strings
 {
     public static readonly Dictionary<string, (string It, string En)> Table = new()
     {
+        // ------------------------------------------------------------------ portabilita'
+        ["PortableBadge"] = ("Portabile", "Portable"),
+        ["OscdimgNotFound"] = ("oscdimg.exe non è disponibile.", "oscdimg.exe is not available."),
+        ["ConfirmGetOscdimg"] = ("Come vuoi ottenerlo?\n\nSÌ = versione PORTABILE (consigliata): scarica da Microsoft solo i Deployment Tools, estrae oscdimg ed i file di boot nella cartella tools\\oscdimg accanto all'app. Nulla viene installato nel sistema; puoi copiare la cartella su altri PC.\n\nNO = installa i Deployment Tools del Windows ADK nel sistema.\n\nANNULLA = non fare nulla.", "How do you want to get it?\n\nYES = PORTABLE copy (recommended): downloads only the Deployment Tools from Microsoft and extracts oscdimg and boot files into the tools\\oscdimg folder next to the app. Nothing is installed on the system; you can copy the folder to other PCs.\n\nNO = install the Windows ADK Deployment Tools on the system.\n\nCANCEL = do nothing."),
+        ["BtnPortableOscdimg"] = ("oscdimg _portabile", "_Portable oscdimg"),
+        ["TipPortableOscdimg"] = ("Mette oscdimg.exe, etfsboot.com ed efisys*.bin in tools\\oscdimg accanto all'app, senza installare nulla: li copia dall'ADK se presente, altrimenti li scarica da Microsoft (firma verificata) ed estrae il solo pacchetto Oscdimg (Ctrl+Maiusc+P).", "Places oscdimg.exe, etfsboot.com and efisys*.bin in tools\\oscdimg next to the app without installing anything: copies them from the ADK if present, otherwise downloads from Microsoft (signature verified) and extracts only the Oscdimg package (Ctrl+Shift+P)."),
+        ["PortableOk"] = ("oscdimg portabile pronto in tools\\oscdimg.", "Portable oscdimg ready in tools\\oscdimg."),
+        ["PortableFailed"] = ("Recupero portabile di oscdimg non riuscito.", "Portable oscdimg retrieval failed."),
+        ["PortableFailedLong"] = ("Non è stato possibile preparare oscdimg in modo portabile.\n\nPuoi riprovare, installare l'ADK nel sistema («Installa ADK») e poi premere di nuovo «oscdimg portabile» per copiarlo accanto all'app, oppure copiare a mano oscdimg.exe, etfsboot.com ed efisys.bin in tools\\oscdimg.\n\nLog: {0}", "Could not prepare a portable oscdimg.\n\nYou can retry, install the ADK on the system (“Install ADK”) and press “Portable oscdimg” again to copy it next to the app, or manually copy oscdimg.exe, etfsboot.com and efisys.bin into tools\\oscdimg.\n\nLog: {0}"),
+        ["OscdimgOriginPortable"] = ("copia portabile", "portable copy"),
+        ["OscdimgOriginSystem"] = ("dal sistema", "from the system"),
+        ["StagePortableCopy"] = ("Preparazione di oscdimg portabile…", "Preparing portable oscdimg…"),
+        ["StagePortableLayout"] = ("Download dei Deployment Tools dell'ADK (layout offline)…", "Downloading ADK Deployment Tools (offline layout)…"),
+        ["StagePortableLayoutDetail"] = ("Nessuna installazione: i file vengono solo scaricati in una cartella temporanea dell'app.", "No installation: files are only downloaded to a temporary app folder."),
+        ["StagePortableExtract"] = ("Estrazione di oscdimg (msiexec /a, senza installazione)…", "Extracting oscdimg (msiexec /a, no installation)…"),
+        ["ErrPortableNotWritable"] = ("La cartella dell'app non è scrivibile: sposta l'app in una cartella tua (non Program Files) per usare la modalità portabile.", "The app folder is not writable: move the app to a folder of yours (not Program Files) to use portable mode."),
+        ["AboutPortableOn"] = ("Modalità portabile ATTIVA: impostazioni, log e strumenti sono nella cartella dell'app (Data\\, tools\\). L'app non scrive nel profilo né nel registro (solo le finestre Apri/Salva di Windows ricordano le ultime cartelle).", "Portable mode ON: settings, logs and tools live in the app folder (Data\\, tools\\). The app writes nothing to the profile or registry (only Windows Open/Save dialogs remember recent folders)."),
+        ["AboutPortableOff"] = ("Modalità portabile NON attiva (cartella dell'app non scrivibile o file no-portable.txt presente): dati in %ProgramData% e %LOCALAPPDATA%.", "Portable mode OFF (app folder not writable or no-portable.txt present): data in %ProgramData% and %LOCALAPPDATA%."),
         // ------------------------------------------------------------------ generali
         ["Subtitle"] = ("Monta VHD/VHDX, cattura e crea ISO con oscdimg", "Mount VHD/VHDX, capture and build ISO images with oscdimg"),
         ["Version"] = ("Versione", "Version"),
@@ -165,9 +183,9 @@ internal static class Strings
         ["BtnDetect"] = ("Ri_leva", "De_tect"),
         ["TipDetect"] = ("Cerca di nuovo oscdimg.exe.", "Searches for oscdimg.exe again."),
         ["BtnInstallAdk"] = ("Installa _ADK", "Install _ADK"),
-        ["TipInstallAdk"] = ("Scarica da Microsoft l'installer del Windows ADK, ne verifica la firma digitale e installa solo i Deployment Tools in modo silenzioso (Ctrl+I).", "Downloads the Windows ADK installer from Microsoft, verifies its digital signature and silently installs only the Deployment Tools (Ctrl+I)."),
+        ["TipInstallAdk"] = ("Installa nel SISTEMA (non portabile): scarica da Microsoft l'installer del Windows ADK, ne verifica la firma digitale e installa solo i Deployment Tools in modo silenzioso (Ctrl+I).", "Installs on the SYSTEM (not portable): downloads the Windows ADK installer from Microsoft, verifies its digital signature and silently installs only the Deployment Tools (Ctrl+I)."),
         ["OscdimgInfo"] = ("Trovato: {0} (versione {1})", "Found: {0} (version {1})"),
-        ["OscdimgInfoMissing"] = ("oscdimg.exe non trovato. Usa «Installa ADK» oppure indica il percorso.", "oscdimg.exe not found. Use “Install ADK” or set the path."),
+        ["OscdimgInfoMissing"] = ("oscdimg.exe non trovato. Usa «oscdimg portabile» (consigliato), «Installa ADK» oppure indica il percorso.", "oscdimg.exe not found. Use “Portable oscdimg” (recommended), “Install ADK” or set the path."),
         ["PresetTitle"] = ("Preset rapidi", "Quick presets"),
         ["PresetBoot"] = ("Windows avviabile (BIOS+UEFI)", "Bootable Windows (BIOS+UEFI)"),
         ["PresetData"] = ("Dati UDF", "UDF data"),
@@ -343,7 +361,6 @@ internal static class Strings
         // ------------------------------------------------------------------ conferme
         ["ConfirmCancel"] = ("Vuoi davvero interrompere l'operazione in corso?", "Do you really want to stop the running operation?"),
         ["ConfirmCloseBusy"] = ("Un'operazione è in corso. Interromperla e chiudere?\nI dischi montati dall'app verranno smontati.", "An operation is running. Stop it and close?\nDisks mounted by the app will be dismounted."),
-        ["ConfirmInstallAdk"] = ("oscdimg.exe non è installato.\n\nVuoi scaricare da Microsoft e installare solo i «Deployment Tools» del Windows ADK? (circa 100-200 MB, serve Internet, nessun riavvio)", "oscdimg.exe is not installed.\n\nDownload from Microsoft and install only the Windows ADK “Deployment Tools”? (about 100-200 MB, Internet required, no reboot)"),
         ["ConfirmReinstallAdk"] = ("oscdimg è già presente. Vuoi comunque eseguire l'installazione/aggiornamento dei Deployment Tools del Windows ADK?", "oscdimg is already present. Run the Windows ADK Deployment Tools install/update anyway?"),
         ["ConfirmOverwrite"] = ("Il file esiste già:\n{0}\n\nSovrascriverlo?", "The file already exists:\n{0}\n\nOverwrite it?"),
         ["ConfirmStagingMirror"] = ("La cartella di lavoro non è vuota:\n{0}\n\nVerrà sincronizzata con la sorgente (i file in più saranno ELIMINATI). Continuare?", "The working folder is not empty:\n{0}\n\nIt will be mirrored with the source (extra files will be DELETED). Continue?"),
@@ -401,8 +418,8 @@ internal static class Strings
         ["AboutTitle"] = ("Informazioni su VHD ISO Studio", "About VHD ISO Studio"),
         ["AboutShortcuts"] = ("Scorciatoie da tastiera", "Keyboard shortcuts"),
         ["ShortcutsList"] = (
-            "F5 / Ctrl+Invio   Avvia (scheda corrente)\nEsc               Annulla l'operazione\nCtrl+O            Scegli disco virtuale\nCtrl+M / Ctrl+U   Monta / Smonta\nCtrl+1…4          Cambia scheda\nCtrl+L            Italiano / English\nCtrl+T            Tema successivo\nCtrl+Maiusc+C     Copia comando oscdimg\nCtrl+I            Installa ADK\nCtrl+Maiusc+L     Apri cartella log\nF1                Informazioni\nAlt+lettera       Tasti di accesso sottolineati",
-            "F5 / Ctrl+Enter   Start (current tab)\nEsc               Cancel operation\nCtrl+O            Choose virtual disk\nCtrl+M / Ctrl+U   Mount / Dismount\nCtrl+1…4          Switch tab\nCtrl+L            Italiano / English\nCtrl+T            Next theme\nCtrl+Shift+C      Copy oscdimg command\nCtrl+I            Install ADK\nCtrl+Shift+L      Open log folder\nF1                About\nAlt+letter        Underlined access keys"),
+            "F5 / Ctrl+Invio   Avvia (scheda corrente)\nEsc               Annulla l'operazione\nCtrl+O            Scegli disco virtuale\nCtrl+M / Ctrl+U   Monta / Smonta\nCtrl+1…4          Cambia scheda\nCtrl+L            Italiano / English\nCtrl+T            Tema successivo\nCtrl+Maiusc+C     Copia comando oscdimg\nCtrl+I            Installa ADK nel sistema\nCtrl+Maiusc+P     oscdimg portabile\nCtrl+Maiusc+L     Apri cartella log\nF1                Informazioni\nAlt+lettera       Tasti di accesso sottolineati",
+            "F5 / Ctrl+Enter   Start (current tab)\nEsc               Cancel operation\nCtrl+O            Choose virtual disk\nCtrl+M / Ctrl+U   Mount / Dismount\nCtrl+1…4          Switch tab\nCtrl+L            Italiano / English\nCtrl+T            Next theme\nCtrl+Shift+C      Copy oscdimg command\nCtrl+I            Install ADK on system\nCtrl+Shift+P      Portable oscdimg\nCtrl+Shift+L      Open log folder\nF1                About\nAlt+letter        Underlined access keys"),
         ["AboutAccessibility"] = ("Accessibilità", "Accessibility"),
         ["ChkReduceMotion"] = ("Riduci le animazioni", "Reduce motion"),
         ["TipReduceMotion"] = ("Disattiva dissolvenze e animazioni. Vengono disattivate anche se Windows ha le animazioni spente.", "Turns off fades and animations. They are also off when Windows animations are disabled."),
@@ -410,8 +427,8 @@ internal static class Strings
         ["AboutPaths"] = ("Percorsi", "Paths"),
         ["AboutChangelog"] = ("Novità", "Changelog"),
         ["ChangelogText"] = (
-            "1.0.0 (2026-11-17)\n• Prima versione: montaggio VHD/VHDX, cattura diretta/robocopy/DISM WIM\n• Tutti i parametri di oscdimg con anteprima e validazione\n• Modalità automatica con riconoscimento del contenuto\n• Installazione ADK Deployment Tools con verifica firma Microsoft\n• Italiano/inglese, temi Scuro/Intermedio/Chiaro, accessibilità",
-            "1.0.0 (2026-11-17)\n• First release: VHD/VHDX mounting, direct/robocopy/DISM WIM capture\n• Every oscdimg parameter with preview and validation\n• Automatic mode with content detection\n• ADK Deployment Tools install with Microsoft signature check\n• Italian/English, Dark/Medium/Light themes, accessibility"),
+            "1.1.0 (2026-11-18)\n• Completamente portabile: dati, log e impostazioni in Data\\ accanto all'exe\n• oscdimg portabile in tools\\oscdimg senza installare l'ADK (layout + msiexec /a)\n• Pacchetto ZIP portabile senza estrazioni in %TEMP%\n\n1.0.0 (2026-11-17)\n• Prima versione: montaggio VHD/VHDX, cattura diretta/robocopy/DISM WIM\n• Tutti i parametri di oscdimg con anteprima e validazione\n• Modalità automatica con riconoscimento del contenuto\n• Installazione ADK Deployment Tools con verifica firma Microsoft\n• Italiano/inglese, temi Scuro/Intermedio/Chiaro, accessibilità",
+            "1.1.0 (2026-11-18)\n• Fully portable: data, logs and settings in Data\\ next to the exe\n• Portable oscdimg in tools\\oscdimg without installing the ADK (layout + msiexec /a)\n• Portable ZIP package with no extraction to %TEMP%\n\n1.0.0 (2026-11-17)\n• First release: VHD/VHDX mounting, direct/robocopy/DISM WIM capture\n• Every oscdimg parameter with preview and validation\n• Automatic mode with content detection\n• ADK Deployment Tools install with Microsoft signature check\n• Italian/English, Dark/Medium/Light themes, accessibility"),
         ["AboutLicense"] = ("Licenza", "License"),
         ["LicenseText"] = ("Software libero con licenza MIT. oscdimg.exe, DISM e il Windows ADK sono componenti Microsoft soggetti alle rispettive licenze e non sono inclusi nell'app.", "Free software under the MIT license. oscdimg.exe, DISM and the Windows ADK are Microsoft components under their own licenses and are not bundled with the app."),
         ["BtnClose"] = ("_Chiudi", "_Close"),

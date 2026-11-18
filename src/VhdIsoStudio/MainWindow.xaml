@@ -390,6 +390,8 @@
                 <DockPanel Margin="0,0,0,6">
                   <Button DockPanel.Dock="Right" Content="{l:Tr BtnInstallAdk}" Tag="&#xE896;" Margin="8,0,0,0"
                           Click="BtnInstallAdk_Click" ToolTip="{l:Tr TipInstallAdk}"/>
+                  <Button DockPanel.Dock="Right" Style="{StaticResource Primary}" Padding="14,7" Content="{l:Tr BtnPortableOscdimg}"
+                          Tag="&#xE8F1;" Margin="8,0,0,0" Click="BtnPortableOscdimg_Click" ToolTip="{l:Tr TipPortableOscdimg}"/>
                   <Button DockPanel.Dock="Right" Content="{l:Tr BtnDetect}" Tag="&#xE72C;" Margin="8,0,0,0"
                           Click="BtnDetectOscdimg_Click" ToolTip="{l:Tr TipDetect}"/>
                   <Button DockPanel.Dock="Right" Content="…" Margin="8,0,0,0" Click="BtnBrowseOscdimg_Click"

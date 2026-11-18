@@ -1,0 +1,42 @@
+VHD ISO Studio - versione PORTABILE / PORTABLE edition
+======================================================
+
+IT
+--
+1. Estrai lo ZIP in una cartella TUA (chiavetta USB, D:\Tools\VhdIsoStudio, ...).
+   Evita "Program Files": deve essere scrivibile.
+2. Avvia VhdIsoStudio.exe (richiede un account amministratore).
+3. Al primo uso, se oscdimg manca, scegli "SI" = versione portabile:
+   oscdimg.exe, etfsboot.com ed efisys*.bin vengono scaricati da Microsoft (firma verificata)
+   ed estratti in tools\oscdimg, SENZA installare nulla nel sistema.
+
+Tutto resta nella cartella dell'app:
+  Data\            impostazioni (settings.json), log, download e file temporanei
+  tools\oscdimg\   oscdimg.exe + file di boot (dopo il primo recupero)
+
+L'app non scrive in %TEMP%, %APPDATA%, %ProgramData% o nel registro (anche la cartella scratch di
+DISM e' in Data\Work). Uniche eccezioni, fuori dal controllo dell'app: le finestre Apri/Salva di
+Windows ricordano le ultime cartelle, e i componenti di sistema (PowerShell, DISM) gestiscono le
+proprie cache.
+Per spostarla basta copiare l'intera cartella. Per disattivare la modalita' portabile crea un file
+vuoto "no-portable.txt" accanto all'exe.
+Componenti di Windows usati (sempre presenti): DISM, robocopy, Windows PowerShell 5.1 (modulo Storage).
+oscdimg e' un componente Microsoft del Windows ADK: non e' incluso nello ZIP, viene scaricato da
+Microsoft sul tuo PC. Copiare la cartella tools\oscdimg su altri PC e' a tua discrezione secondo
+le condizioni di licenza Microsoft.
+
+EN
+--
+1. Extract the ZIP to a folder of YOURS (USB stick, D:\Tools\VhdIsoStudio, ...). Avoid "Program Files".
+2. Run VhdIsoStudio.exe (administrator account required).
+3. On first use, if oscdimg is missing, choose "YES" = portable copy: oscdimg.exe, etfsboot.com and
+   efisys*.bin are downloaded from Microsoft (signature verified) and extracted into tools\oscdimg,
+   WITHOUT installing anything on the system.
+
+Everything stays in the app folder: Data\ (settings, logs, downloads, temp files) and tools\oscdimg\.
+The app writes nothing to %TEMP%, %APPDATA%, %ProgramData% or the registry (DISM scratch is in
+Data\Work too). Only exceptions, outside the app's control: Windows Open/Save dialogs remember recent
+folders and system components (PowerShell, DISM) manage their own caches. To move it, copy the whole
+folder. Create an empty "no-portable.txt" next to the exe to disable portable mode.
+oscdimg is a Microsoft Windows ADK component: it is not included in the ZIP and is downloaded from
+Microsoft on your PC; copying tools\oscdimg to other PCs is up to you under Microsoft's license terms.

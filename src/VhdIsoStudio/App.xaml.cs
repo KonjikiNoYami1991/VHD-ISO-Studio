@@ -11,6 +11,9 @@
  *            <file.vhd|vhdx> (precompila la sorgente).
  *
  * Changelog
+ * 1.1.0 (2026-11-18) - Completamente portabile: Data\ accanto all'exe (impostazioni, log, download,
+ *                      lavoro), oscdimg + file di boot in tools\oscdimg senza installare l'ADK
+ *                      (layout offline + msiexec /a), build ZIP portabile senza estrazioni in %TEMP%.
  * 1.0.0 (2026-11-17) - Prima versione: montaggio VHD/VHDX, cattura diretta/robocopy/DISM,
  *                      tutti i parametri oscdimg, modalita' automatica, installazione ADK
  *                      Deployment Tools con verifica firma, IT/EN, temi, accessibilita'.
@@ -37,6 +40,7 @@ public partial class App : Application
         StartupArgs = e.Args;
         Logger.Init();
         Logger.Info($"==== {AppInfo.Name} {AppInfo.Version} avvio — {Environment.OSVersion} — {System.Runtime.InteropServices.RuntimeInformation.OSArchitecture}");
+        Logger.Info($"Modalita' portabile: {(AppInfo.IsPortable ? "si'" : "no")} — dati: {AppInfo.MachineDataDir}");
 
         // gestori globali: nessun crash silenzioso
         DispatcherUnhandledException += OnDispatcherException;

@@ -56,7 +56,8 @@ public sealed class AboutWindow : Window
         body.Children.Add(Muted(Loc.T("AboutA11yText")));
 
         body.Children.Add(Text(Loc.T("AboutPaths"), 15, FontWeights.SemiBold, top: 14));
-        body.Children.Add(Mono($"Log:      {Logger.CurrentFile}\nSettings: {AppSettings.FilePath}\nExe:      {AppInfo.ExePath}"));
+        body.Children.Add(Muted(Loc.T(AppInfo.IsPortable ? "AboutPortableOn" : "AboutPortableOff")));
+        body.Children.Add(Mono($"Log:      {Logger.CurrentFile}\nSettings: {AppSettings.FilePath}\nTools:    {AppInfo.ToolsDir}\nExe:      {AppInfo.ExePath}"));
         var openLog = new Button { Content = Loc.T("BtnOpenLogFolder"), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 8, 0, 0) };
         openLog.Click += (_, _) =>
         {

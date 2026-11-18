@@ -16,12 +16,11 @@ public static class AdkInstaller
     public const string FallbackUrl = "https://download.microsoft.com/download/2/d/9/2d9c8902-3fcd-48a6-a22a-432b08bed61e/ADK/adksetup.exe";
     public const string SilentArgs = "/quiet /norestart /ceip off /features OptionId.DeploymentTools";
 
-    public static async Task<bool> InstallAsync(string? url, IProgress<JobProgress> progress, CancellationToken ct)
+    /// <summary>Scarica adksetup.exe e ne verifica la firma Microsoft. Restituisce il percorso o null.</summary>
+    public static async Task<string?> DownloadVerifiedAsync(string? url, IProgress<JobProgress> progress, CancellationToken ct)
     {
         Directory.CreateDirectory(AppInfo.DownloadDir);
         string setup = Path.Combine(AppInfo.DownloadDir, "adksetup.exe");
-        bool downloaded = false;
-
         foreach (var u in new[] { string.IsNullOrWhiteSpace(url) ? DefaultUrl : url!, FallbackUrl }.Distinct())
         {
             try
@@ -34,8 +33,7 @@ public static class AdkInstaller
                     continue;
                 }
                 Logger.Success("adksetup.exe firmato da: " + who);
-                downloaded = true;
-                break;
+                return setup;
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception ex)
@@ -43,12 +41,19 @@ public static class AdkInstaller
                 Logger.Warn($"Download da {u} non riuscito: {ex.Message}");
             }
         }
+        return null;
+    }
+
+    public static async Task<bool> InstallAsync(string? url, IProgress<JobProgress> progress, CancellationToken ct)
+    {
+        string? setup = await DownloadVerifiedAsync(url, progress, ct).ConfigureAwait(false);
+        bool downloaded = setup != null;
 
         if (downloaded)
         {
             progress.Report(new JobProgress(Loc.T("StageAdkInstall"), null, Loc.T("StageAdkInstallDetail")));
             string log = Path.Combine(AppInfo.LogDir, $"adksetup_{DateTime.Now:yyyyMMdd_HHmmss}.log");
-            var r = await ProcessRunner.RunAsync(setup, $"{SilentArgs} /log \"{log}\"", null, ct,
+            var r = await ProcessRunner.RunAsync(setup!, $"{SilentArgs} /log \"{log}\"", null, ct,
                 timeout: TimeSpan.FromMinutes(60)).ConfigureAwait(false);
             if (r.Cancelled) throw new OperationCanceledException(ct);
             if (r.ExitCode is 0 or 3010)
@@ -109,5 +114,5 @@ public static class AdkInstaller
         File.Move(tmp, dest, true);
     }
 
-    private static void TryDelete(string f) { try { File.Delete(f); } catch { } }
+    internal static void TryDelete(string f) { try { File.Delete(f); } catch { } }
 }

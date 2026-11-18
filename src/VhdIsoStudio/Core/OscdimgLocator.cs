@@ -51,16 +51,17 @@ public static class OscdimgLocator
     {
         if (!string.IsNullOrWhiteSpace(customPath) && File.Exists(customPath)) return customPath;
 
-        string local = Path.Combine(AppContext.BaseDirectory, "oscdimg.exe");
-        if (File.Exists(local)) return local;
-        string tools = Path.Combine(AppContext.BaseDirectory, "tools", "oscdimg.exe");
-        if (File.Exists(tools)) return tools;
-
-        foreach (var dir in OscdimgFolders())
+        // 1) copia portabile accanto all'exe (tools\oscdimg, tools, cartella exe)
+        foreach (var f in new[]
         {
-            string f = Path.Combine(dir, "oscdimg.exe");
+            Path.Combine(AppInfo.ToolsDir, "oscdimg.exe"),
+            Path.Combine(AppInfo.AppDir, "tools", "oscdimg.exe"),
+            Path.Combine(AppInfo.AppDir, "oscdimg.exe")
+        })
             if (File.Exists(f)) return f;
-        }
+
+        // 2) Windows ADK installato
+        if (FindInstalledAdk() is string adk) return adk;
         foreach (var dir in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries))
         {
             try
@@ -72,6 +73,20 @@ public static class OscdimgLocator
         }
         return null;
     }
+
+    /// <summary>oscdimg.exe del Windows ADK installato nel sistema (null se assente).</summary>
+    public static string? FindInstalledAdk()
+    {
+        foreach (var dir in OscdimgFolders())
+        {
+            string f = Path.Combine(dir, "oscdimg.exe");
+            if (File.Exists(f)) return f;
+        }
+        return null;
+    }
+
+    public static bool IsPortableCopy(string? path) =>
+        path != null && Path.GetFullPath(path).StartsWith(Path.GetFullPath(AppInfo.AppDir), StringComparison.OrdinalIgnoreCase);
 
     /// <summary>File di boot forniti dall'ADK nella stessa cartella di oscdimg.exe.</summary>
     public static (string Bios, string Uefi, string UefiNoPrompt) AdkBootFiles(string? oscdimgPath)

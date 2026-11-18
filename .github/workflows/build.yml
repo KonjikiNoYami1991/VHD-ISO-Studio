@@ -37,30 +37,52 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Publish
+      - name: Publish (exe singolo + pacchetto portabile)
         shell: pwsh
         run: |
-          dotnet publish src/VhdIsoStudio/VhdIsoStudio.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o out
           $ver = ([regex]::Match((Get-Content src/VhdIsoStudio/VhdIsoStudio.csproj -Raw), '<Version>([^<]+)</Version>')).Groups[1].Value
-          $name = "VhdIsoStudio_${ver}_${{ matrix.rid }}.exe"
-          Copy-Item out/VhdIsoStudio.exe $name
-          $hash = (Get-FileHash $name -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash *$name" | Set-Content "$name.sha256" -Encoding ascii
-          "EXE_NAME=$name" | Out-File $env:GITHUB_ENV -Append
-      - name: Selftest
+          # 1) exe singolo (le librerie native WPF vengono estratte in %TEMP% all'avvio)
+          dotnet publish src/VhdIsoStudio/VhdIsoStudio.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o out-single
+          $exe = "VhdIsoStudio_${ver}_${{ matrix.rid }}.exe"
+          Copy-Item out-single/VhdIsoStudio.exe $exe
+          # 2) cartella portabile (librerie native accanto all'exe: nessuna scrittura fuori dalla cartella)
+          $pkg = "pkg/VhdIsoStudio"
+          dotnet publish src/VhdIsoStudio/VhdIsoStudio.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:PortableBuild=true -o $pkg
+          Get-ChildItem $pkg -Filter *.pdb | Remove-Item
+          Copy-Item docs/LEGGIMI-PORTABLE.txt $pkg/
+          Copy-Item LICENSE $pkg/LICENSE.txt
+          New-Item -ItemType Directory -Force "$pkg/tools/oscdimg" | Out-Null
+          "oscdimg.exe, etfsboot.com, efisys.bin, efisys_noprompt.bin: downloaded here by the app on first use (Microsoft Windows ADK component, not redistributed)." | Set-Content "$pkg/tools/oscdimg/README.txt" -Encoding utf8
+          $zip = "VhdIsoStudio_${ver}_${{ matrix.rid }}_portable.zip"
+          Compress-Archive -Path "pkg/VhdIsoStudio" -DestinationPath $zip
+          foreach ($f in @($exe, $zip)) {
+            $hash = (Get-FileHash $f -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash *$f" | Set-Content "$f.sha256" -Encoding ascii
+          }
+          Get-ChildItem $pkg | Format-Table Name, Length
+          "EXE_NAME=$exe" | Out-File $env:GITHUB_ENV -Append
+          "ZIP_NAME=$zip" | Out-File $env:GITHUB_ENV -Append
+      - name: Selftest (exe singolo + portabile)
         if: matrix.rid == 'win-x64'
         shell: pwsh
         run: |
           # i runner GitHub sono elevati: l'exe requireAdministrator parte senza prompt UAC
           $p = Start-Process -FilePath ".\$env:EXE_NAME" -ArgumentList '--selftest' -Wait -PassThru
-          if ($p.ExitCode -ne 0) { throw "Selftest fallito: codice $($p.ExitCode)" }
-          Write-Host "Selftest OK"
+          if ($p.ExitCode -ne 0) { throw "Selftest exe singolo fallito: codice $($p.ExitCode)" }
+          # portabile: estrae lo ZIP in una cartella pulita e verifica che i dati finiscano in Data\
+          Expand-Archive $env:ZIP_NAME -DestinationPath st
+          $p = Start-Process -FilePath "st\VhdIsoStudio\VhdIsoStudio.exe" -ArgumentList '--selftest' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Selftest portabile fallito: codice $($p.ExitCode)" }
+          if (-not (Get-ChildItem "st\VhdIsoStudio\Data\Logs" -Filter *.log -ErrorAction SilentlyContinue)) { throw "Modalita' portabile: log non creato in Data\Logs" }
+          Write-Host "Selftest OK (single + portable, log in Data\Logs)"
       - uses: actions/upload-artifact@v4
         with:
           name: VhdIsoStudio-${{ matrix.rid }}
           path: |
             ${{ env.EXE_NAME }}
             ${{ env.EXE_NAME }}.sha256
+            ${{ env.ZIP_NAME }}
+            ${{ env.ZIP_NAME }}.sha256
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -68,3 +90,5 @@ jobs:
           files: |
             ${{ env.EXE_NAME }}
             ${{ env.EXE_NAME }}.sha256
+            ${{ env.ZIP_NAME }}
+            ${{ env.ZIP_NAME }}.sha256

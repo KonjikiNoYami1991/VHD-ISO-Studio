@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _cts;
     private bool _busy;
     private bool _closeAfterCancel;
+    private bool _lastJobCancelled;
     private bool _loading = true;
     private JobResult? _lastResult;
     private string? _oscdimgPath;
@@ -120,7 +121,8 @@ public partial class MainWindow : Window
     private void UpdateAdminBadge()
     {
         var a = AdminGuard.Check();
-        AdminText.Text = a.IsDomainAdmin ? Loc.T("AdminDomain") : Loc.T("AdminLocal");
+        AdminText.Text = (a.IsDomainAdmin ? Loc.T("AdminDomain") : Loc.T("AdminLocal")) +
+                         (AppInfo.IsPortable ? " · " + Loc.T("PortableBadge") : "");
         AdminBadge.ToolTip = a.User;
         AutomationProperties.SetName(AdminBadge, AdminText.Text + " — " + a.User);
     }
@@ -185,6 +187,7 @@ public partial class MainWindow : Window
             case Key.T: CmbTheme.SelectedIndex = (CmbTheme.SelectedIndex + 1) % CmbTheme.Items.Count; break;
             case Key.C when shift: BtnCopyCmd_Click(this, e); break;
             case Key.I: if (!_busy) BtnInstallAdk_Click(this, e); break;
+            case Key.P when shift: if (!_busy) BtnPortableOscdimg_Click(this, e); break;
             default: return;
         }
         e.Handled = true;
@@ -247,7 +250,8 @@ public partial class MainWindow : Window
         {
             OscdimgStatusText.Text = Loc.T("OscdimgOk");
             BtnOscdimgStatus.Tag = "";
-            OscdimgInfo.Text = Loc.F("OscdimgInfo", _oscdimgPath, OscdimgLocator.FileVersion(_oscdimgPath));
+            OscdimgInfo.Text = Loc.F("OscdimgInfo", _oscdimgPath, OscdimgLocator.FileVersion(_oscdimgPath)) + "  —  " +
+                Loc.T(OscdimgLocator.IsPortableCopy(_oscdimgPath) ? "OscdimgOriginPortable" : "OscdimgOriginSystem");
         }
         else
         {
@@ -283,32 +287,52 @@ public partial class MainWindow : Window
         await EnsureOscdimgAsync(forceInstall: true);
     }
 
-    /// <summary>Restituisce il percorso di oscdimg; se manca propone (e avvia) l'installazione ADK.</summary>
+    private async void BtnPortableOscdimg_Click(object sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        await AcquireOscdimgAsync(portable: true);
+    }
+
+    /// <summary>
+    /// Restituisce il percorso di oscdimg; se manca chiede come ottenerlo:
+    /// Si = copia PORTABILE accanto all'exe (consigliato, nulla installato), No = installa l'ADK nel sistema.
+    /// </summary>
     private async Task<string?> EnsureOscdimgAsync(bool forceInstall = false)
     {
         DetectOscdimg(false);
         if (_oscdimgPath != null && !forceInstall) return _oscdimgPath;
 
-        string q = _oscdimgPath != null ? Loc.T("ConfirmReinstallAdk") : Loc.T("ConfirmInstallAdk");
-        if (MessageBox.Show(this, q, AppInfo.Name, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-            return _oscdimgPath;
+        string q = (_oscdimgPath != null ? Loc.T("ConfirmReinstallAdk") : Loc.T("OscdimgNotFound")) + Environment.NewLine + Environment.NewLine + Loc.T("ConfirmGetOscdimg");
+        var answer = MessageBox.Show(this, q, AppInfo.Name, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+        if (answer == MessageBoxResult.Cancel || answer == MessageBoxResult.None) return _oscdimgPath;
+        return await AcquireOscdimgAsync(portable: answer == MessageBoxResult.Yes);
+    }
 
+    private async Task<string?> AcquireOscdimgAsync(bool portable)
+    {
         bool ok = false;
         await RunBusyAsync(async (p, ct) =>
         {
-            ok = await AdkInstaller.InstallAsync(S.AdkDownloadUrl, p, ct);
+            ok = portable
+                ? await PortableTools.AcquireAsync(S.AdkDownloadUrl, p, ct)
+                : await AdkInstaller.InstallAsync(S.AdkDownloadUrl, p, ct);
             return null;
-        }, "StageAdkDownload");
+        }, portable ? "StagePortableCopy" : "StageAdkDownload", silentSuccess: true);
+
+        // dopo una copia portabile la si preferisce a un eventuale percorso personalizzato
+        if (portable && ok && PortableTools.HasPortableOscdimg) TxtOscdimgPath.Text = "";
         DetectOscdimg(true);
-        if (_oscdimgPath != null)
+        if (ok && _oscdimgPath != null)
         {
-            SetStatus(Loc.T("AdkInstalled"), StatusKind.Ok);
+            SetStatus(Loc.T(portable ? "PortableOk" : "AdkInstalled"), StatusKind.Ok);
             RefreshPreview();
+            SaveSettings();
         }
-        else if (!ok)
+        else if (!ok && !_lastJobCancelled)
         {
-            SetStatus(Loc.T("AdkFailed"), StatusKind.Error);
-            MessageBox.Show(this, Loc.F("AdkFailedLong", Logger.CurrentFile), AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+            SetStatus(Loc.T(portable ? "PortableFailed" : "AdkFailed"), StatusKind.Error);
+            MessageBox.Show(this, Loc.F(portable ? "PortableFailedLong" : "AdkFailedLong", Logger.CurrentFile),
+                AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Error);
         }
         return _oscdimgPath;
     }
@@ -1103,6 +1127,7 @@ public partial class MainWindow : Window
     {
         if (_busy) return;
         SetBusy(true);
+        _lastJobCancelled = false;
         _cts = new CancellationTokenSource();
         _stage = ""; _stageFirstPct = -1;
         var progress = new Progress<JobProgress>(OnProgress);
@@ -1125,6 +1150,7 @@ public partial class MainWindow : Window
         }
         catch (OperationCanceledException)
         {
+            _lastJobCancelled = true;
             Logger.Warn("Operazione annullata dall'utente.");
             SetStatus(Loc.T("StatusCancelled"), StatusKind.Warn);
         }
