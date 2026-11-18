@@ -16,6 +16,10 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <NoWarn>CS8618</NoWarn>
   </PropertyGroup>
+  <!-- come l'SDK WindowsDesktop con UseWPF: System.IO NON e' tra gli using impliciti -->
+  <ItemGroup>
+    <Using Remove="System.IO" />
+  </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
     <Compile Include="../../src/VhdIsoStudio/**/*.cs" Exclude="../../src/VhdIsoStudio/obj/**;../../src/VhdIsoStudio/bin/**" />
