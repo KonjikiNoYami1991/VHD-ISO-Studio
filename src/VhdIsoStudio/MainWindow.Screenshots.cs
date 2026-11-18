@@ -80,7 +80,7 @@ public partial class MainWindow
         var dv = new DrawingVisual();
         using (var dc = dv.RenderOpen())
         {
-            dc.PushTransform(new ScaleTransform(ShotScale, ShotScale));
+            // la scala la applica gia' RenderTargetBitmap tramite i DPI (96 * ShotScale)
             dc.DrawRectangle(Background, null, new Rect(size));
             dc.DrawRectangle(new VisualBrush(root) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top },
                              null, new Rect(size));

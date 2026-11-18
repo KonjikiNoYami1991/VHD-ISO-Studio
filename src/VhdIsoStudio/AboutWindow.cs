@@ -13,6 +13,8 @@ public sealed class AboutWindow : Window
 {
     public AboutWindow()
     {
+        // lo stile implicito di Window non si applica alle sottoclassi: lo imposto esplicitamente
+        SetResourceReference(StyleProperty, typeof(Window));
         Title = Loc.Plain("AboutTitle");
         Width = 640; Height = 680; MinWidth = 480; MinHeight = 400;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;

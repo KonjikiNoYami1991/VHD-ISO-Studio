@@ -5,6 +5,7 @@
         Title="VHD ISO Studio" Icon="Assets/app.ico"
         Width="1180" Height="820" MinWidth="900" MinHeight="620"
         WindowStartupLocation="CenterScreen"
+        Style="{StaticResource {x:Type Window}}"
         AutomationProperties.Name="VHD ISO Studio">
 
   <Grid>
