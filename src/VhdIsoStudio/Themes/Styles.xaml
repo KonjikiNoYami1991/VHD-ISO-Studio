@@ -371,8 +371,10 @@
     </Setter>
   </Style>
 
+  <!-- Nota: il colore del testo dell'intestazione e' impostato SOLO sugli elementi del template,
+       non su TabItem.Foreground, che altrimenti verrebbe ereditato dal contenuto della scheda. -->
   <Style TargetType="{x:Type TabItem}">
-    <Setter Property="Foreground" Value="{DynamicResource FgMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
     <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
     <Setter Property="Cursor" Value="Hand"/>
     <Setter Property="Template">
@@ -380,19 +382,23 @@
         <ControlTemplate TargetType="{x:Type TabItem}">
           <Border x:Name="Bd" CornerRadius="18" Padding="16,8" Margin="0,0,6,0" Background="Transparent">
             <StackPanel Orientation="Horizontal">
-              <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource Icon}" Margin="0,0,8,0"
-                         Foreground="{TemplateBinding Foreground}"/>
-              <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+              <TextBlock x:Name="Ic" Text="{TemplateBinding Tag}" Style="{StaticResource Icon}" Margin="0,0,8,0"
+                         Foreground="{DynamicResource FgMuted}"/>
+              <ContentPresenter x:Name="Hd" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"
+                                TextElement.Foreground="{DynamicResource FgMuted}"/>
             </StackPanel>
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
               <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Hover}"/>
+              <Setter TargetName="Ic" Property="Foreground" Value="{DynamicResource Fg}"/>
+              <Setter TargetName="Hd" Property="TextElement.Foreground" Value="{DynamicResource Fg}"/>
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
               <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Accent}"/>
-              <Setter Property="Foreground" Value="{DynamicResource OnAccent}"/>
-              <Setter Property="FontWeight" Value="SemiBold"/>
+              <Setter TargetName="Ic" Property="Foreground" Value="{DynamicResource OnAccent}"/>
+              <Setter TargetName="Hd" Property="TextElement.Foreground" Value="{DynamicResource OnAccent}"/>
+              <Setter TargetName="Hd" Property="TextElement.FontWeight" Value="SemiBold"/>
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>

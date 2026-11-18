@@ -224,7 +224,7 @@
                         <GridView>
                           <GridViewColumn Header="{l:Tr ColDrive}" Width="70" DisplayMemberBinding="{Binding DriveLetter}"/>
                           <GridViewColumn Header="{l:Tr ColLabel}" Width="170" DisplayMemberBinding="{Binding Label}"/>
-                          <GridViewColumn Header="{l:Tr ColFs}" Width="80" DisplayMemberBinding="{Binding FileSystem}"/>
+                          <GridViewColumn Header="{l:Tr ColFs}" Width="110" DisplayMemberBinding="{Binding FileSystem}"/>
                           <GridViewColumn Header="{l:Tr ColSize}" Width="100" DisplayMemberBinding="{Binding SizeText}"/>
                           <GridViewColumn Header="{l:Tr ColUsed}" Width="100" DisplayMemberBinding="{Binding UsedText}"/>
                           <GridViewColumn Header="{l:Tr ColType}" Width="90" DisplayMemberBinding="{Binding PartitionType}"/>
