@@ -57,29 +57,29 @@ def main():
 
     logo = Image.open(ROOT / "src/VhdIsoStudio/Assets/app.png").convert("RGBA").resize((112, 112), Image.LANCZOS)
     bg.alpha_composite(logo, (64, 70))
-    d.text((196, 78), "VHD ISO Studio", font=font(BOLD, 60), fill="white")
-    d.text((198, 150), "VHD/VHDX  →  WIM  →  ISO  ·  oscdimg GUI", font=font(SEMI, 26), fill=(224, 231, 255))
+    d.text((190, 84), "VHD ISO Studio", font=font(BOLD, 50), fill="white")
+    d.text((192, 146), "VHD/VHDX → WIM → ISO · oscdimg GUI", font=font(SEMI, 21), fill=(224, 231, 255))
 
     y = 236
     for line in ("Monta, cattura e crea ISO avviabili BIOS + UEFI",
                  "Mount, capture & build bootable BIOS + UEFI ISOs"):
-        d.text((68, y), line, font=font(REG, 27), fill=(240, 244, 255))
-        y += 42
+        d.text((68, y), line, font=font(REG, 22), fill=(240, 244, 255))
+        y += 36
 
     chips = ["Tutti i parametri oscdimg", "Modalità automatica", "100% portabile",
              "IT / EN", "3 temi + alto contrasto", ".NET 10 · x64 · ARM64"]
-    f = font(SEMI, 21)
+    f = font(SEMI, 18)
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ld = ImageDraw.Draw(layer)
-    x, y = 68, 350
+    x, y = 68, 336
     pos = []
     for c in chips:
         tw = ld.textlength(c, font=f)
-        if x + tw + 40 > 640:
-            x, y = 68, y + 58
-        ld.rounded_rectangle((x, y, x + tw + 32, y + 42), 21, fill=(255, 255, 255, 38), outline=(255, 255, 255, 120), width=2)
-        pos.append((x + 16, y + 8, c))
-        x += tw + 44
+        if x + tw + 40 > 630:
+            x, y = 68, y + 50
+        ld.rounded_rectangle((x, y, x + tw + 28, y + 38), 19, fill=(255, 255, 255, 38), outline=(255, 255, 255, 120), width=2)
+        pos.append((x + 14, y + 8, c))
+        x += tw + 38
     bg.alpha_composite(layer)
     d = ImageDraw.Draw(bg)
     for px_, py_, c in pos:
@@ -87,13 +87,13 @@ def main():
 
     d.text((68, 560), "Windows 10 / 11  ·  open source  ·  MIT", font=font(REG, 21), fill=(199, 210, 254))
 
-    shot_path = IMG / "auto-dark-it.png"
+    shot_path = IMG / "screenshots" / "auto-dark-it.png"
     if shot_path.exists():
         shot = Image.open(shot_path).convert("RGB")
-        sw = 600
+        sw = 540
         shot = shot.resize((sw, int(shot.height * sw / shot.width)), Image.LANCZOS)
         shot = rounded(shot, 18)
-        sx, sy = 650, 120
+        sx, sy = 700, (H - shot.height) // 2
         shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         ImageDraw.Draw(shadow).rounded_rectangle((sx + 10, sy + 18, sx + shot.width + 10, sy + shot.height + 18), 18, fill=(0, 0, 0, 140))
         bg.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(16)))
